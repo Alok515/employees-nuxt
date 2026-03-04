@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { employeeSchema } from "~~/schemas/employee"
 
 const { $api } = useNuxtApp()
@@ -7,34 +7,58 @@ const employeeData = reactive({
     name: "",
     role: "",
     department: "",
-    salary: 0
+    salary: ""
 })
-const error = ref("")
+const formError = ref("")
+const fieldErrors = reactive({
+    name: "",
+    role: "",
+    department: "",
+    salary: ""
+})
+
+function resetErrors() {
+    formError.value = ""
+    fieldErrors.name = ""
+    fieldErrors.role = ""
+    fieldErrors.department = ""
+    fieldErrors.salary = ""
+}
 
 const submit = async () => {
+    resetErrors()
+
     const result = employeeSchema.safeParse(employeeData)
 
     if (!result.success) {
-        error.value = result.error.message
+        const errors = result.error.flatten().fieldErrors
+        fieldErrors.name = errors.name?.[0] ?? ""
+        fieldErrors.role = errors.role?.[0] ?? ""
+        fieldErrors.department = errors.department?.[0] ?? ""
+        fieldErrors.salary = errors.salary?.[0] ?? ""
         return
     }
 
-    await $api("/employees", {
-        method: "POST",
-        body: employeeData
-    })
+    try {
+        await $api("/employees", {
+            method: "POST",
+            body: result.data
+        })
 
-    resetData()
+        resetData()
 
-    navigateTo("/employees")
+        navigateTo("/employees")
+    } catch {
+        formError.value = "Unable to add employee. Please try again."
+    }
 }
 
 function resetData() {
-    error.value = ""
+    formError.value = ""
     employeeData.name = ""
     employeeData.role = ""
     employeeData.department = ""
-    employeeData.salary = 0
+    employeeData.salary = ""
 }
 </script>
 
@@ -47,27 +71,39 @@ function resetData() {
 
             <form class="mt-8 grid gap-4 sm:grid-cols-2" @submit.prevent="submit">
                 <label class="text-sm font-medium text-slate-700 sm:col-span-2">
-                    Name
-                    <input v-model="employeeData.name" placeholder="John Carter" class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200" />
+                    Name <span class="text-rose-600">*</span>
+                    <input v-model="employeeData.name" required placeholder="John Carter" class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-2 focus:ring-emerald-200" :class="fieldErrors.name ? 'border-rose-300 focus:border-rose-500' : 'border-slate-300 focus:border-emerald-500'" />
+                    <p v-if="fieldErrors.name" class="mt-1 text-xs font-medium text-rose-600">
+                        {{ fieldErrors.name }}
+                    </p>
                 </label>
 
                 <label class="text-sm font-medium text-slate-700">
-                    Role
-                    <input v-model="employeeData.role" placeholder="Software Engineer" class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200" />
+                    Role <span class="text-rose-600">*</span>
+                    <input v-model="employeeData.role" required placeholder="Software Engineer" class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-2 focus:ring-emerald-200" :class="fieldErrors.role ? 'border-rose-300 focus:border-rose-500' : 'border-slate-300 focus:border-emerald-500'" />
+                    <p v-if="fieldErrors.role" class="mt-1 text-xs font-medium text-rose-600">
+                        {{ fieldErrors.role }}
+                    </p>
                 </label>
 
                 <label class="text-sm font-medium text-slate-700">
-                    Department
-                    <input v-model="employeeData.department" placeholder="Engineering" class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200" />
+                    Department <span class="text-rose-600">*</span>
+                    <input v-model="employeeData.department" required placeholder="Engineering" class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-2 focus:ring-emerald-200" :class="fieldErrors.department ? 'border-rose-300 focus:border-rose-500' : 'border-slate-300 focus:border-emerald-500'" />
+                    <p v-if="fieldErrors.department" class="mt-1 text-xs font-medium text-rose-600">
+                        {{ fieldErrors.department }}
+                    </p>
                 </label>
 
                 <label class="text-sm font-medium text-slate-700 sm:col-span-2">
-                    Salary
-                    <input v-model.number="employeeData.salary" type="number" min="1000" step="100" placeholder="50000" class="mt-2 w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-200" />
+                    Salary <span class="text-rose-600">*</span>
+                    <input v-model="employeeData.salary" required type="number" min="1000" step="100" placeholder="50000" class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-2 focus:ring-emerald-200" :class="fieldErrors.salary ? 'border-rose-300 focus:border-rose-500' : 'border-slate-300 focus:border-emerald-500'" />
+                    <p v-if="fieldErrors.salary" class="mt-1 text-xs font-medium text-rose-600">
+                        {{ fieldErrors.salary }}
+                    </p>
                 </label>
 
-                <p v-if="error" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 sm:col-span-2">
-                    {{ error }}
+                <p v-if="formError" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 sm:col-span-2">
+                    {{ formError }}
                 </p>
 
                 <div class="flex flex-wrap gap-3 sm:col-span-2">

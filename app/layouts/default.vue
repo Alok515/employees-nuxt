@@ -9,7 +9,7 @@ const runtimeConfig = useRuntimeConfig()
 const currentYear = useState("current-year", () => new Date().getFullYear())
 const isLoggingOut = ref(false)
 const companyName = computed(() =>
-  runtimeConfig.public.companyName || "Northridge People Co."
+  runtimeConfig.public.companyName || "Alok People Co."
 )
 
 await callOnce("layout-session", async () => {
@@ -47,7 +47,7 @@ const logout = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-[calc(100vh-4rem)] flex-col">
+  <div class="flex min-h-full flex-col">
     <AppNavbar
       :company-name="companyName"
       :is-login-screen="isLoginScreen"

@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     apiSecret: '',
     public: {
       apiBase: '/api',
-      companyName: 'Northridge People Co.'
+      companyName: 'Alok People Co.'
     }
   }
 })

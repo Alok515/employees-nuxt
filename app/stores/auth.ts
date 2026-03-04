@@ -6,13 +6,22 @@ export const useAuthStore = defineStore("auth", () => {
   const user = ref<User | null>(null)
 
   const login = async (email:string,password:string) => {
+    try {
+      await $api("/api/login",{
+        method:"POST",
+        body:{email,password}
+      })
 
-    await $api("/api/login",{
-      method:"POST",
-      body:{email,password}
-    })
+      await fetchSession()
+    } catch (error: any) {
+      const status = error?.statusCode ?? error?.status ?? error?.response?.status
 
-    await fetchSession()
+      if (status === 401) {
+        throw new Error("Wrong email or password")
+      }
+
+      throw new Error("Unable to sign in. Please try again.")
+    }
   }
 
   const fetchSession = async () => {

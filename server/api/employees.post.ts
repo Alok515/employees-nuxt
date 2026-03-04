@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
     if (!parsed.success) {
         throw createError({
             statusCode: 400,
-            statusMessage: parsed.error.message
+            statusMessage: parsed.error.issues[0]?.message ?? "Invalid employee payload"
         })
     }
     const db = await readDB()
