@@ -1,12 +1,12 @@
-# Nuxt Employee Dashboard (Production Architecture Demo)
+# Nuxt Employee Management Dashboard
 
 ## Overview
 
-This project is a **production-style Nuxt 3 application** designed to demonstrate modern full-stack architecture patterns.
+This project is a **production-style Nuxt 3 full-stack application** demonstrating how a modern web system can combine frontend, backend APIs, and data persistence in a single framework.
 
-The application simulates an **Employee Management Dashboard** with authentication, server APIs, pagination, caching, and performance optimizations.
+The application simulates a **company employee management dashboard** with authentication, role-based access, employee CRUD operations, pagination, and observability logging.
 
-The goal of this project is to showcase how Nuxt can be used to build scalable, maintainable, production-ready applications.
+The project is intentionally designed to showcase **real production architecture patterns** rather than just UI components.
 
 ---
 
@@ -21,63 +21,192 @@ Frontend
 
 Backend
 
-* Nitro Server (built into Nuxt)
+* Nitro Server (Nuxt server runtime)
 * Server API routes
+
+Data Layer
+
+* JSON file database (`main.db.json`)
+* 5000 seeded employees
+* UUID identifiers
 
 Infrastructure Concepts
 
 * SSR (Server Side Rendering)
-* Cookie Authentication
-* API Rate Limiting
-* Response Caching
-* Request Tracing
-* Observability Logging
+* Cookie based authentication
+* Role-based access control
+* API rate limiting
+* Structured server logging
+* Request retry and error handling
 
 ---
 
-# Key Features
+# Features
 
-### Server Side Rendering
+## Authentication
 
-Pages are rendered on the server using `useAsyncData`, improving performance and SEO.
+Authentication uses **HTTP-only cookies** to store the user session.
 
-### Nitro API Layer
+Login endpoint validates credentials and sets a session cookie.
 
-Backend APIs are implemented using Nuxt Nitro server routes.
+Example accounts:
+
+Admin user
+
+```
+admin@test.com
+admin123
+```
+
+Employee users
+
+```
+emp1@test.com
+emp123
+emp2@test.com
+emp123
+```
+
+Admin users have full access while employee users can only view their own employee profile.
+
+---
+
+# Role Based Access
+
+Admin can:
+
+* View all employees
+* Add new employees
+* Edit employee details
+* Access dashboard statistics
+
+Employee users can:
+
+* Login
+* View only their own employee record
+
+---
+
+# Employee Management
+
+The system manages **5000 employees seeded automatically** when the server starts if the database is empty.
+
+Each employee contains:
+
+```
+id (UUID)
+name
+role
+department
+salary
+```
+
+---
+
+# Backend Architecture
+
+The backend uses Nuxt Nitro server routes.
 
 Example endpoints:
 
-```
-/api/employees
-/api/login
-/api/session
-```
-
-### Authentication
-
-Authentication uses **HTTP-only cookies** instead of localStorage to improve security.
-
-Features:
-
-* login API
-* session endpoint
-* route middleware protection
-
-### Pagination
-
-Employees are fetched using server-side pagination.
-
-Example:
+List employees with pagination
 
 ```
-/employees?page=2
+GET /api/employees?page=1
 ```
 
-### State Management
+Get single employee
 
-Pinia is used to manage global application state such as authentication.
+```
+GET /api/employees/{id}
+```
 
-### Composables
+Create employee
+
+```
+POST /api/employees
+```
+
+Update employee
+
+```
+PATCH /api/employees/{id}
+```
+
+Delete employee
+
+```
+DELETE /api/employees/{id}
+```
+
+Authentication APIs
+
+```
+POST /api/login
+GET /api/session
+```
+
+Dashboard API
+
+```
+GET /api/dashboard
+```
+
+---
+
+# Database Layer
+
+The project uses a **JSON file as a lightweight database**.
+
+File:
+
+```
+main.db.json
+```
+
+Utility helpers handle reading and writing the database:
+
+```
+server/utils/db.ts
+```
+
+Employees are automatically seeded using:
+
+```
+server/utils/seedEmployees.ts
+```
+
+This creates 5000 employees with random roles and departments.
+
+---
+
+# Frontend Architecture
+
+The frontend follows a **layered architecture** to keep responsibilities separated.
+
+Pages handle UI and routing.
+
+Composables manage application logic and state.
+
+Plugins handle shared infrastructure such as the API client.
+
+Example architecture flow:
+
+```
+Page
+ ↓
+Composable
+ ↓
+API Plugin
+ ↓
+Nitro API
+ ↓
+JSON Database
+```
+
+---
+
+# Composables
 
 Reusable data logic is implemented using composables.
 
@@ -87,99 +216,97 @@ Example:
 composables/useEmployees.ts
 ```
 
-### Middleware Protection
+Responsibilities:
 
-Protected routes require authentication.
+* fetching paginated employees
+* managing loading state
+* storing total employee count
+
+---
+
+# API Client Plugin
+
+A global API client plugin centralizes network communication.
 
 ```
-middleware/auth.ts
+plugins/api.ts
+```
+
+Features:
+
+* automatic retry
+* centralized error handling
+* redirect to login on unauthorized requests
+
+Usage example:
+
+```
+const { $api } = useNuxtApp()
+const employees = await $api("/employees?page=1")
 ```
 
 ---
 
-# Performance Optimizations
+# Pagination
 
-### API Caching
+Employees are fetched using server-side pagination.
 
-Server responses are cached using Nitro's cached event handler.
+Example:
 
 ```
-defineCachedEventHandler
+/employees?page=2
 ```
 
-### Request Deduplication
+The backend returns:
 
-Nuxt automatically deduplicates identical requests using `useAsyncData` keys.
-
-### Lazy Component Loading
-
-Components are dynamically imported to reduce bundle size.
-
-### Code Splitting
-
-Nuxt automatically splits pages into separate bundles.
+```
+{
+  data: [...employees],
+  total: 5000
+}
+```
 
 ---
 
-# Reliability Features
+# Dashboard
 
-### Request Retry
+The dashboard displays company statistics such as the **total number of employees**.
 
-API requests automatically retry when temporary network errors occur.
+Example API:
 
-### Global Error Handling
+```
+GET /api/dashboard
+```
 
-Centralized API error interception handles authentication failures and server errors.
+Response:
 
-### Hydration Safety
-
-Browser-only logic is wrapped using `ClientOnly` or `process.client`.
-
----
-
-# Security
-
-### Cookie Based Sessions
-
-Authentication uses HTTP-only cookies which prevents JavaScript access.
-
-### API Rate Limiting
-
-Server middleware prevents excessive API requests from the same IP.
+```
+{
+  totalEmployees: 5000
+}
+```
 
 ---
 
-# Observability
+# Observability Logging
 
-The project includes basic observability patterns.
-
-### Structured Logging
-
-Server requests are logged with structured metadata.
+The server includes **structured logging** for monitoring API activity.
 
 Example log entry:
 
 ```
 {
-  "type": "request",
-  "path": "/api/employees",
-  "method": "GET"
+  "type": "request_start",
+  "method": "GET",
+  "path": "/api/employees"
 }
 ```
 
-### Request Tracing
+This allows easier debugging and can be integrated with log aggregation systems such as:
 
-Each request receives a unique trace ID for debugging distributed systems.
-
-Response header:
-
-```
-x-trace-id
-```
-
-### Server Timing Metrics
-
-Server processing time is exposed using the `Server-Timing` header.
+* ELK stack
+* Grafana Loki
+* Datadog
 
 ---
 
@@ -187,8 +314,6 @@ Server processing time is exposed using the `Server-Timing` header.
 
 ```
 components/
-  employee/
-  ui/
 
 composables/
   useEmployees.ts
@@ -201,40 +326,47 @@ pages/
   dashboard.vue
   employees/
     index.vue
+    new.vue
     [id].vue
+
+plugins/
+  api.ts
+
+stores/
+  auth.ts
 
 server/
   api/
   middleware/
   plugins/
+  utils/
 
-stores/
-  auth.ts
+main.db.json
 ```
 
 ---
 
 # Running the Project
 
-Install dependencies:
+Install dependencies
 
 ```
 npm install
 ```
 
-Run development server:
+Run development server
 
 ```
 npm run dev
 ```
 
-Build production version:
+Build production version
 
 ```
 npm run build
 ```
 
-Preview production build:
+Preview production build
 
 ```
 npm run preview
@@ -244,29 +376,34 @@ npm run preview
 
 # What This Project Demonstrates
 
-This project demonstrates how Nuxt can unify frontend and backend development in a single architecture.
+This project demonstrates how Nuxt can be used to build a **full-stack production-style application** with both frontend and backend capabilities.
 
 Concepts included:
 
 * SSR rendering
-* API backend
-* authentication
-* caching
-* rate limiting
-* observability
-* performance optimization
+* Nitro backend APIs
+* authentication and session cookies
+* role-based access control
+* composable data layer
+* centralized API client plugin
+* pagination
+* CRUD operations
+* structured server logging
 
-The architecture reflects patterns commonly used in modern SaaS dashboards.
+The architecture closely resembles patterns used in real SaaS dashboards and internal company tools.
 
 ---
 
 # Possible Future Improvements
 
-* database integration
-* role-based authorization
+Planned enhancements:
+
+* server-side search and filtering for employees
+* indexed lookups for large datasets
 * Redis caching
-* background jobs
-* monitoring integration
+* role-based permissions system
+* database integration (PostgreSQL)
 * CI/CD deployment pipeline
+* monitoring and metrics dashboards
 
 ---

@@ -6,4 +6,13 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
   ],
   devtools: { enabled: true },
+  routeRules: {
+    "/employees": { swr: 60 }
+  },
+  runtimeConfig: {
+    apiSecret: '',
+    public: {
+      apiBase: '/api'
+    }
+  }
 })
