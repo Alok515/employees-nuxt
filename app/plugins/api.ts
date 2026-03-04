@@ -16,7 +16,7 @@ export default defineNuxtPlugin(() => {
         onResponseError({ response }) {
 
             if (response.status === 401) {
-                navigateTo("/login")
+                navigateTo("/")
             }
 
             if (response.status >= 500) {

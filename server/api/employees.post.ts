@@ -1,22 +1,31 @@
 import { readDB, writeDB } from "../utils/db"
 import { v4 as uuid } from "uuid"
+import { employeeSchema } from "~~/schemas/employee"
 
 export default defineEventHandler(async (event) => {
 
-  const body = await readBody(event)
-  const db = await readDB()
+    const body = await readBody(event)
+    const parsed = employeeSchema.safeParse(body)
 
-  const newEmployee = {
-    id: uuid(),
-    name: body.name,
-    role: body.role,
-    department: body.department,
-    salary: body.salary
-  }
+    if (!parsed.success) {
+        throw createError({
+            statusCode: 400,
+            statusMessage: parsed.error.message
+        })
+    }
+    const db = await readDB()
 
-  db.employees.push(newEmployee)
+    const newEmployee = {
+        id: uuid(),
+        name: parsed.data.name,
+        role: parsed.data.role,
+        department: parsed.data.department,
+        salary: parsed.data.salary
+    }
 
-  await writeDB(db)
+    db.employees.push(newEmployee)
 
-  return newEmployee
+    await writeDB(db)
+
+    return newEmployee
 })

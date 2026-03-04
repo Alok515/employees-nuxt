@@ -2,7 +2,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   modules: [
     '@pinia/nuxt',
-    '@nuxt/image',
     '@nuxtjs/tailwindcss',
   ],
   devtools: { enabled: true },
@@ -12,7 +11,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     apiSecret: '',
     public: {
-      apiBase: '/api'
+      apiBase: '/api',
+      companyName: 'Northridge People Co.'
     }
   }
 })

@@ -10,3 +10,8 @@ export  interface Employee {
   department: string
   salary: number
 }
+
+export type EmployeesResponse = {
+  data: Employee[]
+  total: number
+}
