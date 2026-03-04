@@ -22,7 +22,7 @@ const route = useRoute()
 <template>
   <header class="mb-6 rounded-2xl border border-white/70 bg-white/85 px-4 py-4 shadow-sm backdrop-blur sm:px-6">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <NuxtLink to="/" class="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+      <NuxtLink to="/dashboard" class="text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
         {{ companyName }}
       </NuxtLink>
 
