@@ -10,8 +10,10 @@ A full-stack Nuxt 4 employee management application with login, dashboard, emplo
 - Employee list with pagination (page size: `9`)
 - Add and edit employee forms powered by a reusable dynamic form component
 - Zod validation on both client and server
-- JSON-based data storage in `main.db.json`
+- Seed data sourced from `main.db.json`
+- Runtime DB auto-initialization in `server/utils/db.ts` (uses `/tmp/main.db.json` on Vercel)
 - Seed plugin to generate employees when DB is empty
+- Employees list/API served with `no-store` caching to avoid stale SSR/CSR hydration mismatches after edits
 
 ## Tech Stack
 - Nuxt 4
@@ -48,6 +50,7 @@ From `main.db.json`:
 - `GET /api/employees?page=1`
   - Returns paginated employees and total count
   - Uses `EMPLOYEE_PAGE_SIZE` from `data/data.ts`
+  - Sets `Cache-Control: no-store` to keep list data fresh after mutations
 - `POST /api/employees`
   - Creates employee after `employeeSchema` validation
 - `GET /api/employees/:id`
@@ -93,6 +96,12 @@ This keeps users on the exact list page where that employee appears.
 Defined in `nuxt.config.ts`:
 - `public.apiBase` (default: `/api`)
 - `public.companyName` (default: `Alok People Co.`)
+
+## Deployment Notes (Vercel)
+- The app does not rely on reading `main.db.json` from the runtime filesystem.
+- Seed JSON is bundled at build time and used to initialize runtime storage automatically.
+- On Vercel, writes go to `/tmp/main.db.json` (ephemeral storage).
+- Because `/tmp` is ephemeral, data is not durable across cold starts/redeploys. Use a managed database for persistent production data.
 
 ## Scripts
 - `npm run dev` - Start dev server
