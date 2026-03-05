@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const route = useRoute()
 
+definePageMeta({ middleware: "auth" })
+
 const page = computed(() => Number(route.query.page) || 1)
 const prevPage = computed(() => page.value - 1)
 const nextPage = computed(() => page.value + 1)

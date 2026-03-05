@@ -4,6 +4,8 @@ import { EMPLOYEE_FORM_FIELDS } from "~~/data/data"
 import { employeeSchema } from "~~/schemas/employee"
 import type { Employee } from "~~/types"
 
+definePageMeta({ middleware: "auth" })
+
 const { $api } = useNuxtApp()
 const route = useRoute()
 

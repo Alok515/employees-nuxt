@@ -3,6 +3,8 @@ import DynamicFormFields from "~/components/form/DynamicFormFields.vue"
 import { EMPLOYEE_FORM_FIELDS } from "~~/data/data"
 import { employeeSchema } from "~~/schemas/employee"
 
+definePageMeta({ middleware: "auth" })
+
 const { $api } = useNuxtApp()
 
 type EmployeeFieldKey = (typeof EMPLOYEE_FORM_FIELDS)[number]["key"]
