@@ -1,6 +1,6 @@
 import { EMPLOYEE_PAGE_SIZE } from "~~/data/data"
 
-export default defineCachedEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const query = getQuery(event)
 
   const page = Number(query.page) || 1
@@ -11,11 +11,10 @@ export default defineCachedEventHandler(async (event) => {
   const start = (page - 1) * limit
   const end = start + limit
 
+  setHeader(event, "Cache-Control", "no-store")
+
   return {
     data: db.employees.slice(start, end),
     total: db.employees.length
   }
-
-}, {
-  maxAge: 60
 })
