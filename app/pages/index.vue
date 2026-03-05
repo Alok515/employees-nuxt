@@ -1,12 +1,20 @@
 <script setup lang="ts">
+import DynamicFormFields from "~/components/form/DynamicFormFields.vue"
+import { LOGIN_FORM_FIELDS } from "~~/data/data"
 import { loginSchema } from "~~/schemas/auth"
 
-const email = ref("")
-const password = ref("")
 const isSubmitting = ref(false)
 const formError = ref("")
 
-const fieldErrors = reactive({
+type LoginFieldKey = (typeof LOGIN_FORM_FIELDS)[number]["key"]
+type LoginFormData = Record<LoginFieldKey, string>
+
+const loginData = reactive<LoginFormData>({
+    email: "",
+    password: ""
+})
+
+const fieldErrors = reactive<Record<LoginFieldKey, string>>({
     email: "",
     password: ""
 })
@@ -27,8 +35,8 @@ const login = async () => {
     resetErrors()
 
     const result = loginSchema.safeParse({
-        email: email.value,
-        password: password.value
+        email: loginData.email,
+        password: loginData.password
     })
 
     if (!result.success) {
@@ -64,25 +72,11 @@ const login = async () => {
                 </p>
             </div>
 
-            <form class="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8" @submit.prevent="login">
+            <form class="flex h-full flex-col justify-center rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8" @submit.prevent="login">
                 <h2 class="text-2xl font-semibold text-slate-900">Sign in</h2>
                 <p class="mt-2 text-sm text-slate-600">Use your credentials to access the dashboard.</p>
 
-                <label class="mt-6 block text-sm font-medium text-slate-700">
-                    Email <span class="text-rose-600">*</span>
-                </label>
-                <input v-model="email" type="email" required placeholder="you@company.com" class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-2 focus:ring-cyan-200" :class="fieldErrors.email ? 'border-rose-300 focus:border-rose-500' : 'border-slate-300 focus:border-cyan-500'" />
-                <p v-if="fieldErrors.email" class="mt-1 text-xs font-medium text-rose-600">
-                    {{ fieldErrors.email }}
-                </p>
-
-                <label class="mt-4 block text-sm font-medium text-slate-700">
-                    Password <span class="text-rose-600">*</span>
-                </label>
-                <input v-model="password" type="password" required placeholder="••••••••" class="mt-2 w-full rounded-xl border bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:bg-white focus:ring-2 focus:ring-cyan-200" :class="fieldErrors.password ? 'border-rose-300 focus:border-rose-500' : 'border-slate-300 focus:border-cyan-500'" />
-                <p v-if="fieldErrors.password" class="mt-1 text-xs font-medium text-rose-600">
-                    {{ fieldErrors.password }}
-                </p>
+                <DynamicFormFields v-model="loginData" :fields="LOGIN_FORM_FIELDS" :errors="fieldErrors" tone="cyan" />
 
                 <p v-if="formError" class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                     {{ formError }}

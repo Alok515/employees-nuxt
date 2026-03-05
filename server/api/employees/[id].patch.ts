@@ -1,4 +1,5 @@
 import { readDB, writeDB } from "../../utils/db"
+import { EMPLOYEE_PAGE_SIZE } from "~~/data/data"
 
 export default defineEventHandler(async (event) => {
 
@@ -24,5 +25,14 @@ export default defineEventHandler(async (event) => {
 
   await writeDB(db)
 
-  return db.employees[index]
+  const total = db.employees.length
+  const page = Math.max(1, Math.floor(index / EMPLOYEE_PAGE_SIZE) + 1)
+
+  return {
+    employee: db.employees[index],
+    index,
+    total,
+    page,
+    pageSize: EMPLOYEE_PAGE_SIZE
+  }
 })

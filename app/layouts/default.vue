@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppFooter from "~/components/layout/AppFooter.vue"
 import AppNavbar from "~/components/layout/AppNavbar.vue"
+import { COMPANY_FALLBACK_NAME, NAV_LINKS } from "~~/data/data"
 
 const route = useRoute()
 const auth = useAuthStore()
@@ -9,7 +10,7 @@ const runtimeConfig = useRuntimeConfig()
 const currentYear = useState("current-year", () => new Date().getFullYear())
 const isLoggingOut = ref(false)
 const companyName = computed(() =>
-  runtimeConfig.public.companyName || "Alok People Co."
+  runtimeConfig.public.companyName || COMPANY_FALLBACK_NAME
 )
 
 const isLoginScreen = computed(() =>
@@ -20,11 +21,7 @@ const showLogout = computed(() =>
   !isLoginScreen.value && Boolean(auth.user)
 )
 
-const navLinks = [
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "Employees", to: "/employees" },
-  { label: "Add Employee", to: "/employees/new" }
-]
+const navLinks = NAV_LINKS
 
 const logout = async () => {
   if (isLoggingOut.value) {

@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
         salary: parsed.data.salary
     }
 
-    db.employees.push(newEmployee)
+    db.employees.unshift(newEmployee)
 
     await writeDB(db)
 

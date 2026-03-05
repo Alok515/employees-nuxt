@@ -9,7 +9,7 @@ defineProps<{
   isLoginScreen: boolean
   showLogout: boolean
   isLoggingOut: boolean
-  navLinks: NavLink[]
+  navLinks: readonly NavLink[]
 }>()
 
 const emit = defineEmits<{
