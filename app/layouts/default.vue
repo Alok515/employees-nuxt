@@ -12,10 +12,6 @@ const companyName = computed(() =>
   runtimeConfig.public.companyName || "Alok People Co."
 )
 
-await callOnce("layout-session", async () => {
-  await auth.fetchSession()
-})
-
 const isLoginScreen = computed(() =>
   route.path === "/" || route.path === "/login"
 )
@@ -47,7 +43,7 @@ const logout = async () => {
 </script>
 
 <template>
-  <div class="flex min-h-full flex-col">
+  <div class="flex min-h-full flex-1 flex-col">
     <AppNavbar
       :company-name="companyName"
       :is-login-screen="isLoginScreen"
@@ -57,7 +53,7 @@ const logout = async () => {
       @logout="logout"
     />
 
-    <main class="flex-1">
+    <main class="flex-1 pb-4">
       <slot />
     </main>
 

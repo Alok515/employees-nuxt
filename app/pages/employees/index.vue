@@ -28,7 +28,7 @@ watch(page, () => {
         </header>
 
         <div v-if="loading" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            <UiEmployeeSkeleton v-for="i in 12" :key="i" />
+            <UiEmployeeSkeleton v-for="i in 9" :key="i" />
         </div>
 
         <div v-else-if="!employees.length" class="rounded-2xl border border-dashed border-slate-300 bg-white/75 p-10 text-center">

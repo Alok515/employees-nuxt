@@ -8,7 +8,7 @@
       <div class="absolute bottom-[-8rem] left-1/3 h-96 w-96 rounded-full bg-emerald-200/60 blur-3xl" />
     </div>
 
-    <div class="relative mx-auto w-full max-w-6xl px-4 py-2 pt-4 sm:px-6 lg:px-8">
+    <div class="relative mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 pt-4 sm:px-6 lg:px-8">
       <NuxtErrorBoundary>
         <NuxtLayout>
           <NuxtPage />

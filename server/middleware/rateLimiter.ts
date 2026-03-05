@@ -6,7 +6,7 @@ export default defineEventHandler((event) => {
   const now = Date.now()
 
   const windowTime = 60 * 1000
-  const maxRequests = 20
+  const maxRequests = 60
 
   if (!requests.has(ip)) {
     requests.set(ip, [])

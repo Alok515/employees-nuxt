@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
   const db = await readDB()
 
-  const user: User = db.users.find((u:any) => u.id === session)
+  const user: User | null = db.users.find((u:any) => u.id === session) ?? null
 
   return { user }
 })

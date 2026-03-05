@@ -52,7 +52,7 @@ const login = async () => {
 </script>
 
 <template>
-    <section class="mx-auto flex min-h-[72vh] max-w-5xl items-center">
+    <section class="mx-auto flex w-full max-w-5xl items-center py-2">
         <div class="grid w-full gap-6 rounded-3xl border border-white/70 bg-white/75 p-5 shadow-[0_22px_50px_-28px_rgba(15,23,42,0.55)] backdrop-blur sm:p-8 lg:grid-cols-[1.1fr_1fr]">
             <div class="rounded-2xl bg-gradient-to-br from-cyan-500 to-emerald-500 p-6 text-white sm:p-8">
                 <p class="text-xs font-semibold uppercase tracking-[0.32em] text-white/80">Employee Hub</p>

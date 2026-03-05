@@ -2,7 +2,7 @@ export default defineCachedEventHandler(async (event) => {
   const query = getQuery(event)
 
   const page = Number(query.page) || 1
-  const limit = 12
+  const limit = 9
 
   const db = await readDB()
 

@@ -4,7 +4,7 @@ definePageMeta({ middleware: "auth" })
 
 const { data } = await useAsyncData(
     "dashboard",
-    () => $api("/api/dashboard")
+    () => $api("/dashboard")
 )
 const totalEmployees = computed(() => data.value?.totalEmployees ?? 0)
 </script>

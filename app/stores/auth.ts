@@ -4,13 +4,20 @@ export const useAuthStore = defineStore("auth", () => {
   const { $api } = useNuxtApp()
 
   const user = ref<User | null>(null)
+  const sessionLoaded = ref(false)
 
   const login = async (email:string,password:string) => {
     try {
-      await $api("/api/login",{
+      const res: { id: string; role: string } = await $api("/login",{
         method:"POST",
         body:{email,password}
       })
+
+      user.value = {
+        id: res.id,
+        role: res.role
+      }
+      sessionLoaded.value = true
 
       await fetchSession()
     } catch (error: any) {
@@ -25,17 +32,24 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   const fetchSession = async () => {
-    const res: { user: User | null } = await $api("/session")
-    user.value = res.user
+    try {
+      const res: { user: User | null } = await $api("/session")
+      user.value = res.user
+      sessionLoaded.value = true
+    } catch (error) {
+      user.value = null
+      throw error
+    }
   }
 
   const logout = async () => {
-    await $api("/api/logout", {
+    await $api("/logout", {
       method: "POST"
     })
     user.value = null
+    sessionLoaded.value = true
   }
 
-  return { user, login, fetchSession, logout }
+  return { user, sessionLoaded, login, fetchSession, logout }
 
 })

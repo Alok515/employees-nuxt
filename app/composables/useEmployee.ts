@@ -1,6 +1,5 @@
 import type { Employee } from "~~/types"
 
-
 export const useEmployees = () => {
 
   const employees = ref<Employee[]>([])
@@ -14,7 +13,7 @@ export const useEmployees = () => {
     loading.value = true
 
     try {
-
+      
       const res: { data: Employee[], total: number }  = await $api(`/employees?page=${page}`)
 
       employees.value = res.data
